@@ -10,6 +10,10 @@ class entry_point:
     REFRESH_MS_WHEN_FAILED = 1 * 60 * 1000  # 1 minute
     MAX_RETRIES = 3
 
+    STOCK_SYMBOL = "ARM"
+    STOCK_NAME   = "NASDAQ: ARM"
+    TIMEZONE = "Europe/Paris"
+
     def __init__(self):
         self._display = epaper2in13b.EPD_2in13_B_V4_Landscape()
         self._connection = Connection(secrets.SSID, secrets.PASSWORD)
@@ -89,8 +93,8 @@ class entry_point:
                     self.die()
 
             print("Connected")
-            price, change, change_percent, last_trading_day = InternetGetter.get_stock_price(self._connection)
-            current_time = InternetGetter.get_current_time(self._connection)
+            price, change, change_percent, date = InternetGetter.get_stock_price(self.STOCK_SYMBOL)
+            current_time = InternetGetter.get_current_time(self.TIMEZONE)
             if price == 0.0 and change == 0.0 and change_percent == 0.0:
                 print("API Error")
 
@@ -113,15 +117,14 @@ class entry_point:
                 fb = self._display.imagered
             else:
                 fb = self._display.imageblack
-            self._display.imageblack.text(f"NASDAQ: ARM", 80, 15, 0x00)
+            self._display.imageblack.text(f"{self.STOCK_NAME}", 80, 15, 0x00)
             self._display.imageblack.hline(15, 25, 220, 0x00)
-            fb.text(f"Last closure     {price:.2f}$", 10, 30, 0x00)
-            fb.text(f"Difference       {change:.2f}$", 10, 40, 0x00)
-            fb.text(f"Variation        {change_percent:.2f}%", 10, 50, 0x00)
-            fb.text(f"Last trading day {last_trading_day}", 10, 60, 0x00)
-            self._display.imageblack.text(f"Last lookup", 10, 80, 0x00)
-            self._display.imageblack.text(f"{current_time[:10]}", 10, 90, 0x00)
-            self._display.imageblack.text(f"{current_time[11:]}", 10, 100, 0x00)
+            fb.text(f"Price  {price:.2f}$", 10, 30, 0x00)
+            fb.text(f"Change {change:.2f}$ {change_percent:.2f}%", 10, 40, 0x00)
+            fb.text(f"Date   {date}", 10, 50, 0x00)
+            self._display.imageblack.text(f"Last lookup", 10, 70, 0x00)
+            self._display.imageblack.text(f"{current_time[:10]}", 10, 80, 0x00)
+            self._display.imageblack.text(f"{current_time[11:]}", 10, 90, 0x00)
             self._display.display()
 
             self._wait(for_failure=False)

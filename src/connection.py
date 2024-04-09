@@ -1,5 +1,4 @@
 import network
-import requests
 import time
 
 class Connection:
@@ -29,13 +28,3 @@ class Connection:
         if self._wlan.isconnected():
             return self._wlan.ifconfig()[0]
         return ""
-
-    def request_json(self, url: str):
-        if not self._wlan.isconnected():
-            return {}
-
-        request = requests.get(url)
-        if request.status_code == 200:
-            return request.json()
-        else:
-            return {}
