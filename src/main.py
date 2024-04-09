@@ -24,7 +24,7 @@ class entry_point:
         self.set_devices_low_power()
         while True:
             # Go in low power mode
-            machine.deepsleep(self.REFRESH_MS)
+            machine.lightsleep(self.REFRESH_MS)
 
     def set_devices_low_power(self):
         print("Shutting down devices")
@@ -53,7 +53,7 @@ class entry_point:
         # Go in low power mode
         print("Going to sleep")
         self.set_devices_low_power()
-        machine.deepsleep(self.REFRESH_MS_WHEN_FAILED if for_failure else self.REFRESH_MS)
+        machine.lightsleep(self.REFRESH_MS_WHEN_FAILED if for_failure else self.REFRESH_MS)
 
         print("Waking up")
         self.wake_up_devices()
