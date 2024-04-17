@@ -2,16 +2,25 @@ import network
 import time
 
 class Connection:
-    def __init__(self, ssid, password):
-        self._ssid = ssid
-        self._password = password
+    def __init__(self, credentials):
+        self._credentials = credentials
         self._wlan = network.WLAN(network.STA_IF)
 
-    def connect(self) -> None:
+    def connect(self) -> bool:
+        """" @return: True if the WiFi is connected and there's an IP """
         self._wlan.active(True)
-        self._wlan.connect(self._ssid, self._password)
+        for ssid, password in self._credentials:
+            print(f"Connection: trying {ssid}...")
+            self._wlan.connect(ssid, password)
+            if self._wait_connection():
+                print(f"Connection: connected to {ssid}")
+                return True
+            else:
+                print(f"Connection: failed to connect to {ssid}")
 
-    def wait_connection(self, max_wait: int = 10) -> bool:
+        return False
+
+    def _wait_connection(self, max_wait: int = 5) -> bool:
         """
         It blocks until the WiFi link is established or there is a failure.
         @return True if the WiFi is connected and there is an IP

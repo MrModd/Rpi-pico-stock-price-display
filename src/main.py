@@ -17,14 +17,14 @@ class entry_point:
 
     def __init__(self):
         self._display = epaper2in13b.EPD_2in13_B_V4_Landscape()
+        self._connection = Connection(secrets.WIFI_CREDENTIALS)
+        self._led = machine.Pin("LED", mode=machine.Pin.OUT)
         try:
             self._ups = ina219.INA219(addr=0x43)
         except Exception as e:
             # UPS not connected
             print(f"Exception on I2C bus: {e}")
             self._ups = None
-        self._connection = Connection(secrets.SSID, secrets.PASSWORD)
-        self._led = machine.Pin("LED", mode=machine.Pin.OUT)
 
     def die(self):
         print("FATAL ERROR - The board is going to shut down")
@@ -106,9 +106,7 @@ class entry_point:
             self._display.display()
 
             print("Connecting")
-            self._connection.connect()
-
-            if not self._connection.wait_connection():
+            if not self._connection.connect():
                 print("Connection error")
 
                 self.prepare_screen_layout()
