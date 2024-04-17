@@ -7,6 +7,7 @@ Simple Raspberry Pi Pico program to periodically check the stock price and displ
   micropython firmware. You can download it from the
   Raspberry Pi website.
 * Display e-ink Waveshare Pico-ePaper-2.13 (B)
+* (Optional) Waveshare Pico UPS B
 
 ## Required software
 
