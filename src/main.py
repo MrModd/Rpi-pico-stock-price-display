@@ -4,6 +4,7 @@ from connection import Connection
 from internet_getter import InternetGetter
 import secrets
 import epaper2in13b
+import ina219
 
 class entry_point:
     REFRESH_MS = 60 * 60 * 1000  # 60 minutes
@@ -16,6 +17,12 @@ class entry_point:
 
     def __init__(self):
         self._display = epaper2in13b.EPD_2in13_B_V4_Landscape()
+        try:
+            self._ups = ina219.INA219(addr=0x43)
+        except Exception as e:
+            # UPS not connected
+            print(f"Exception on I2C bus: {e}")
+            self._ups = None
         self._connection = Connection(secrets.SSID, secrets.PASSWORD)
         self._led = machine.Pin("LED", mode=machine.Pin.OUT)
 
@@ -46,6 +53,29 @@ class entry_point:
         self._display.Clear(0xff, 0xff)
         self._display.display()
 
+    def display_battery(self):
+        if self._ups is None:
+            print("No battery detected")
+            return
+
+        bus_voltage = self._ups.getBusVoltage_V()  # voltage on V- (load side)
+        current = self._ups.getCurrent_mA()  # current in mA
+
+        P = (bus_voltage -3)/1.2*100
+        if (P < 0):
+            P=0
+        elif (P > 100):
+            P=100
+
+        # INA219 measure bus voltage on the load side. So PSU voltage = bus_voltage + shunt_voltage
+        print(f"Voltage:  {bus_voltage:6.3f} V")
+        print(f"Current:  {current/1000:6.3f} A")
+        print(f"Percent:  {P:6.1f} %")
+
+        self._display.imageblack.fill_rect(10, 108, 20, 10, 0x00)
+        self._display.imageblack.fill_rect(30, 110, 2, 6, 0x00)
+        self._display.imageblack.text(f"{P:6.1f}%", 30, 110, 0x00)
+
     def prepare_screen_layout(self):
         self._display.imageblack.fill(0x00)
         self._display.imagered.fill(0x00)
@@ -71,6 +101,7 @@ class entry_point:
 
             print("Preparing screen")
             self.prepare_screen_layout()
+            self.display_battery()
             self._display.imageblack.text(f"Connecting...", 80, 60, 0x00)
             self._display.display()
 
@@ -81,6 +112,7 @@ class entry_point:
                 print("Connection error")
 
                 self.prepare_screen_layout()
+                self.display_battery()
                 self._display.imagered.text(f"Connection error", 62, 60, 0x00)
                 self._display.display()
 
@@ -99,6 +131,7 @@ class entry_point:
                 print("API Error")
 
                 self.prepare_screen_layout()
+                self.display_battery()
                 self._display.imagered.text(f"API error", 95, 60, 0x00)
                 self._display.display()
 
@@ -113,6 +146,7 @@ class entry_point:
             failure_retries = self.MAX_RETRIES
 
             self.prepare_screen_layout()
+            self.display_battery()
             if (change_percent < 0):
                 fb = self._display.imagered
             else:

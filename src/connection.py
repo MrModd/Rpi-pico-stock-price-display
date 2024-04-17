@@ -12,6 +12,10 @@ class Connection:
         self._wlan.connect(self._ssid, self._password)
 
     def wait_connection(self, max_wait: int = 10) -> bool:
+        """
+        It blocks until the WiFi link is established or there is a failure.
+        @return True if the WiFi is connected and there is an IP
+        """
         while(max_wait > 0):
             if self._wlan.status() < 0 or self._wlan.status() >= 3:
                 break
