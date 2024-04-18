@@ -1,6 +1,9 @@
 import secrets
 import requests
 
+class RequestException(Exception):
+    pass
+
 class InternetGetter:
     @staticmethod
     def get_stock_price(symbol):
@@ -10,7 +13,7 @@ class InternetGetter:
                                 "&datatype=json" + \
                                 f"&apikey={secrets.ALPHAVANTAGE_API_KEY}")
         if response.status_code != 200:
-            return (0.0, 0.0, 0.0, None)
+            raise RequestException(f"Returned wrong status code: {response.status_code}")
 
         response_d = response.json()
         print(response_d)
@@ -28,18 +31,19 @@ class InternetGetter:
             change_percent = float(change_percent[:-1])
 
             return (price, change, change_percent, date)
-        except KeyError:
-            return (0.0, 0.0, 0.0, None)
+        except KeyError as e:
+            raise RequestException(f"Invalid json response, can't find '{e}'")
 
     @staticmethod
     def get_current_time(timezone):
         response = requests.get(f"http://worldtimeapi.org/api/timezone/{timezone}")
         if response.status_code != 200:
-            return ""
+            # Don't fail just for this
+            return "N.A."
 
         response_d = response.json()
         print(response_d)
         try:
             return response_d["datetime"]
         except KeyError:
-            return ""
+            return "N.A."

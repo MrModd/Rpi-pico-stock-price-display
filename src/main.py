@@ -1,7 +1,7 @@
 import machine
 
 from connection import Connection
-from internet_getter import InternetGetter
+from internet_getter import InternetGetter, RequestException
 import secrets
 import epaper2in13b
 import ina219
@@ -132,10 +132,11 @@ class entry_point:
                     self.die()
 
             print("Connected")
-            price, change, change_percent, date = InternetGetter.get_stock_price(self.STOCK_SYMBOL)
-            current_time = InternetGetter.get_current_time(self.TIMEZONE)
-            if price == 0.0 and change == 0.0 and change_percent == 0.0:
-                print("API Error")
+            try:
+                price, change, change_percent, date = InternetGetter.get_stock_price(self.STOCK_SYMBOL)
+                current_time = InternetGetter.get_current_time(self.TIMEZONE)
+            except RequestException as e:
+                print(f"API Error: {e}")
 
                 self.prepare_screen_layout()
                 self.display_battery()
