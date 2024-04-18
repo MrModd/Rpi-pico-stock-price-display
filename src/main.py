@@ -70,11 +70,20 @@ class entry_point:
         # INA219 measure bus voltage on the load side. So PSU voltage = bus_voltage + shunt_voltage
         print(f"Voltage:  {bus_voltage:6.3f} V")
         print(f"Current:  {current/1000:6.3f} A")
-        print(f"Percent:  {P:6.1f} %")
+        print(f"Percent:  {P:5.1f} %")
 
-        self._display.imageblack.fill_rect(10, 108, 20, 10, 0x00)
-        self._display.imageblack.fill_rect(30, 110, 2, 6, 0x00)
-        self._display.imageblack.text(f"{P:6.1f}%", 30, 110, 0x00)
+        if (P < 30):  # Charge state under 30%
+            fb = self._display.imagered
+        else:
+            fb = self._display.imageblack
+
+        # Battery symbol is 20px long
+        fill_px = int(((P // 10) + 1) * 2)  # How many px to fill based on the battery charge
+        fb.fill_rect(10, 108, fill_px, 10, 0x00)
+        if fill_px < 20:
+            fb.rect(10+fill_px, 108, 20-fill_px, 10, 0x00)
+        fb.fill_rect(30, 110, 2, 6, 0x00)  # This is the positive terminal bump
+        fb.text(f"{P:5.1f}%", 32, 110, 0x00)
 
     def prepare_screen_layout(self):
         self._display.imageblack.fill(0x00)
