@@ -78,12 +78,13 @@ class entry_point:
             fb = self._display.imageblack
 
         # Battery symbol is 20px long
-        fill_px = int(((P // 10) + 1) * 2)  # How many px to fill based on the battery charge
-        fb.fill_rect(10, 108, fill_px, 10, 0x00)
+        fill_px = int((P // 10) * 2)  # How many px to fill based on the battery charge
+        if fill_px > 0:
+            fb.fill_rect(10, 108, fill_px, 10, 0x00)
         if fill_px < 20:
             fb.rect(10+fill_px, 108, 20-fill_px, 10, 0x00)
         fb.fill_rect(30, 110, 2, 6, 0x00)  # This is the positive terminal bump
-        fb.text(f"{P:5.1f}%", 32, 110, 0x00)
+        fb.text(f"{P:5.1f}%", 34, 110, 0x00)
 
     def prepare_screen_layout(self):
         self._display.imageblack.fill(0x00)
@@ -133,7 +134,8 @@ class entry_point:
 
             print("Connected")
             try:
-                price, change, change_percent, date = InternetGetter.get_stock_price(self.STOCK_SYMBOL)
+                # price, change, change_percent, date = InternetGetter.get_stock_price(self.STOCK_SYMBOL)
+                price, change, change_percent, date = InternetGetter.get_terminal_stock_price(self.STOCK_SYMBOL)
                 current_time = InternetGetter.get_current_time(self.TIMEZONE)
             except RequestException as e:
                 print(f"API Error: {e}")

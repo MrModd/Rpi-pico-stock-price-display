@@ -1,3 +1,5 @@
+import re
+
 import secrets
 import requests
 
@@ -13,7 +15,7 @@ class InternetGetter:
                                 "&datatype=json" + \
                                 f"&apikey={secrets.ALPHAVANTAGE_API_KEY}")
         if response.status_code != 200:
-            raise RequestException(f"Returned wrong status code: {response.status_code}")
+            raise RequestException(f"Returned bad status code: {response.status_code}")
 
         response_d = response.json()
         print(response_d)
@@ -33,6 +35,31 @@ class InternetGetter:
             return (price, change, change_percent, date)
         except KeyError as e:
             raise RequestException(f"Invalid json response, can't find '{e}'")
+
+    @staticmethod
+    def get_terminal_stock_price(symbol):
+        response = requests.get(f"http://terminal-stocks.dev/{symbol}")
+        if response.status_code != 200:
+            raise RequestException(f"Returned bad status code: {response.status_code}")
+
+        print(response.text)
+
+        try:
+            resp_str = response.text.split("\n")
+            stock_info = resp_str[4].split("│")
+            date_line = resp_str[6]
+            price = re.match("(?:.+\$)([0-9]+.[0-9]+)(?:.+)", stock_info[2])
+            change = re.match("(?:.+)(-+\$[0-9]+.[0-9]+)(?:.+)", stock_info[3])
+            change_percent = re.match("(?:.+)(-+[0-9]+.[0-9]+)(?:.+)", stock_info[4])
+            # Time is UTC, there's not enough space to print it
+            date = re.match("(?:.+)([A-Z][a-z]+ [0-9]+, [0-9]+, [0-9]+:[0-9]+:[0-9]+)(?:.+)", date_line)
+
+            return (float(price.groups()[0]),
+                    float(change.groups()[0].replace("$", "")),
+                    float(change_percent.groups()[0]),
+                    date.groups()[0])
+        except Exception as e:
+            raise RequestException(f"Cannot parse output: {e}")
 
     @staticmethod
     def get_current_time(timezone):
