@@ -49,8 +49,8 @@ class InternetGetter:
             stock_info = resp_str[4].split("│")
             date_line = resp_str[6]
             price = re.match("(?:.+\$)([0-9]+.[0-9]+)(?:.+)", stock_info[2])
-            change = re.match("(?:.+)(-+\$[0-9]+.[0-9]+)(?:.+)", stock_info[3])
-            change_percent = re.match("(?:.+)(-+[0-9]+.[0-9]+)(?:.+)", stock_info[4])
+            change = re.match("(?:.+)(-?\$[0-9]+.[0-9]+)(?:.+)", stock_info[3])
+            change_percent = re.match("(?:.+)(-?[0-9]+.[0-9]+)(?:.+)", stock_info[4])
             # Time is UTC, there's not enough space to print it
             date = re.match("(?:.+)([A-Z][a-z]+ [0-9]+, [0-9]+, [0-9]+:[0-9]+:[0-9]+)(?:.+)", date_line)
 
