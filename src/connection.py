@@ -4,10 +4,11 @@ import time
 class Connection:
     def __init__(self, credentials):
         self._credentials = credentials
-        self._wlan = network.WLAN(network.STA_IF)
+        self._wlan = None
 
     def connect(self) -> bool:
         """" @return: True if the WiFi is connected and there's an IP """
+        self._wlan = network.WLAN(network.STA_IF)
         self._wlan.active(True)
         for ssid, password in self._credentials:
             print(f"Connection: trying {ssid}...")
@@ -36,6 +37,8 @@ class Connection:
     def disconnect(self) -> None:
         self._wlan.disconnect()
         self._wlan.active(False)
+        self._wlan.deinit()
+        self._wlan = None
 
     def get_ip(self) -> str:
         if self._wlan.isconnected():
