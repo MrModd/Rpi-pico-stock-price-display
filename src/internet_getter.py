@@ -48,11 +48,16 @@ class InternetGetter:
             resp_str = response.text.split("\n")
             stock_info = resp_str[4].split("│")
             date_line = resp_str[6]
-            price = re.match("(?:.+\$)([0-9]+.[0-9]+)(?:.+)", stock_info[2])
-            change = re.match("(?:.+)(-?\$[0-9]+.[0-9]+)(?:.+)", stock_info[3])
-            change_percent = re.match("(?:.+)(-?[0-9]+.[0-9]+)(?:.+)", stock_info[4])
+            price = re.search("([0-9]+\.[0-9]+)", stock_info[2])
+            change = re.search("(-?\$[0-9]+\.[0-9]+)", stock_info[3])
+            change_percent = re.search("(-?[0-9]+\.[0-9]+)", stock_info[4])
             # Time is UTC, there's not enough space to print it
-            date = re.match("(?:.+)([A-Z][a-z]+ [0-9]+, [0-9]+, [0-9]+:[0-9]+:[0-9]+)(?:.+)", date_line)
+            date = re.search("([A-Z][a-z]+ [0-9]+, [0-9]+, [0-9]+:[0-9]+:[0-9]+)", date_line)
+
+            print(f"Price {price.groups()}; " +
+                  f"change {change.groups()}; " +
+                  f"change percent {change_percent.groups()}; " +
+                  f"date {date.groups()}")
 
             return (float(price.groups()[0]),
                     float(change.groups()[0].replace("$", "")),

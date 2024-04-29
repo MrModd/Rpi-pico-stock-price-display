@@ -7,7 +7,7 @@ import epaper2in13b
 import ina219
 
 class entry_point:
-    REFRESH_MS = 60 * 60 * 1000  # 60 minutes
+    REFRESH_MS = 30 * 60 * 1000  # 30 minutes
     REFRESH_MS_WHEN_FAILED = 1 * 60 * 1000  # 1 minute
     MAX_RETRIES = 3
 
