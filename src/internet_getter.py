@@ -68,7 +68,11 @@ class InternetGetter:
 
     @staticmethod
     def get_current_time(timezone):
-        response = requests.get(f"http://worldtimeapi.org/api/timezone/{timezone}")
+        try:
+            response = requests.get(f"http://worldtimeapi.org/api/timezone/{timezone}")
+        except Exception as e:
+            print(f"Exception while getting current time: {e}")
+            return "N.A."
         if response.status_code != 200:
             # Don't fail just for this
             return "N.A."
