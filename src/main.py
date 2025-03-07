@@ -47,6 +47,7 @@ class entry_point:
     def wake_up_devices(self):
         self._led.value(1)
         self._display.reset()
+        # The connecton is restored later
 
     def init_devices(self):
         print("Init devices")
@@ -132,6 +133,10 @@ class entry_point:
                     self.die()
 
             print("Connected")
+            self.prepare_screen_layout()
+            self.display_battery()
+            self._display.imageblack.text("Fetching data", 76, 60, 0x00)
+            self._display.display()
             try:
                 # price, change, change_percent, date = InternetGetter.get_stock_price(self.STOCK_SYMBOL)
                 price, change, change_percent, date = InternetGetter.get_terminal_stock_price(self.STOCK_SYMBOL)
