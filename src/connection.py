@@ -1,6 +1,7 @@
 import network
 import time
 
+
 class Connection:
     def __init__(self, credentials):
         self._credentials = credentials
@@ -26,7 +27,7 @@ class Connection:
         It blocks until the WiFi link is established or there is a failure.
         @return True if the WiFi is connected and there is an IP
         """
-        while(max_wait > 0):
+        while (max_wait > 0):
             if self._wlan.status() < 0 or self._wlan.status() >= 3:
                 break
             max_wait -= 1

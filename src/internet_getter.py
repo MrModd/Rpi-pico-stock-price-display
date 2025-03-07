@@ -3,16 +3,18 @@ import re
 import secrets
 import requests
 
+
 class RequestException(Exception):
     pass
+
 
 class InternetGetter:
     @staticmethod
     def get_stock_price(symbol):
-        response = requests.get("https://www.alphavantage.co/query?" + \
-                                "function=GLOBAL_QUOTE" + \
-                                f"&symbol={symbol}" + \
-                                "&datatype=json" + \
+        response = requests.get("https://www.alphavantage.co/query?" +
+                                "function=GLOBAL_QUOTE" +
+                                f"&symbol={symbol}" +
+                                "&datatype=json" +
                                 f"&apikey={secrets.ALPHAVANTAGE_API_KEY}")
         if response.status_code != 200:
             raise RequestException(f"Returned bad status code: {response.status_code}")

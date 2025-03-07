@@ -6,13 +6,14 @@ import secrets
 import epaper2in13b
 import ina219
 
+
 class entry_point:
     REFRESH_MS = 30 * 60 * 1000  # 30 minutes
     REFRESH_MS_WHEN_FAILED = 1 * 60 * 1000  # 1 minute
     MAX_RETRIES = 3
 
     STOCK_SYMBOL = "ARM"
-    STOCK_NAME   = "NASDAQ: ARM"
+    STOCK_NAME = "NASDAQ: ARM"
     TIMEZONE = "Europe/Paris"
 
     def __init__(self):
@@ -29,7 +30,7 @@ class entry_point:
     def die(self):
         print("FATAL ERROR - The board is going to shut down")
 
-        self._display.imagered.text(f"Device is off", 130, 110, 0x00)
+        self._display.imagered.text("Device is off", 130, 110, 0x00)
         self._display.display()
 
         self.set_devices_low_power()
@@ -61,15 +62,15 @@ class entry_point:
         bus_voltage = self._ups.getBusVoltage_V()  # voltage on V- (load side)
         current = self._ups.getCurrent_mA()  # current in mA
 
-        P = (bus_voltage -3)/1.2*100
+        P = (bus_voltage - 3) / 1.2 * 100
         if (P < 0):
-            P=0
+            P = 0
         elif (P > 100):
-            P=100
+            P = 100
 
         # INA219 measure bus voltage on the load side. So PSU voltage = bus_voltage + shunt_voltage
         print(f"Voltage:  {bus_voltage:6.3f} V")
-        print(f"Current:  {current/1000:6.3f} A")
+        print(f"Current:  {current / 1000:6.3f} A")
         print(f"Percent:  {P:5.1f} %")
 
         if (P < 30):  # Charge state under 30%
@@ -82,7 +83,7 @@ class entry_point:
         if fill_px > 0:
             fb.fill_rect(10, 108, fill_px, 10, 0x00)
         if fill_px < 20:
-            fb.rect(10+fill_px, 108, 20-fill_px, 10, 0x00)
+            fb.rect(10 + fill_px, 108, 20 - fill_px, 10, 0x00)
         fb.fill_rect(30, 110, 2, 6, 0x00)  # This is the positive terminal bump
         fb.text(f"{P:5.1f}%", 34, 110, 0x00)
 
@@ -107,12 +108,10 @@ class entry_point:
 
         failure_retries = self.MAX_RETRIES
         while True:
-            failed = False
-
             print("Preparing screen")
             self.prepare_screen_layout()
             self.display_battery()
-            self._display.imageblack.text(f"Connecting...", 80, 60, 0x00)
+            self._display.imageblack.text("Connecting...", 80, 60, 0x00)
             self._display.display()
 
             print("Connecting")
@@ -121,7 +120,7 @@ class entry_point:
 
                 self.prepare_screen_layout()
                 self.display_battery()
-                self._display.imagered.text(f"Connection error", 62, 60, 0x00)
+                self._display.imagered.text("Connection error", 62, 60, 0x00)
                 self._display.display()
 
                 if failure_retries > 0:
@@ -142,7 +141,7 @@ class entry_point:
 
                 self.prepare_screen_layout()
                 self.display_battery()
-                self._display.imagered.text(f"API error", 95, 60, 0x00)
+                self._display.imagered.text("API error", 95, 60, 0x00)
                 self._display.display()
 
                 if failure_retries > 0:
@@ -166,12 +165,13 @@ class entry_point:
             fb.text(f"Price  {price:.2f}$", 10, 30, 0x00)
             fb.text(f"Change {change:.2f}$ {change_percent:.2f}%", 10, 40, 0x00)
             fb.text(f"Date   {date}", 10, 50, 0x00)
-            self._display.imageblack.text(f"Last lookup", 10, 70, 0x00)
+            self._display.imageblack.text("Last lookup", 10, 70, 0x00)
             self._display.imageblack.text(f"{current_time[:10]}", 10, 80, 0x00)
             self._display.imageblack.text(f"{current_time[11:]}", 10, 90, 0x00)
             self._display.display()
 
             self._wait(for_failure=False)
+
 
 if __name__ == "__main__":
     entry_point = entry_point()
