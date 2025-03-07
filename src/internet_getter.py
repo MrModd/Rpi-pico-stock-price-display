@@ -71,7 +71,7 @@ class InternetGetter:
     @staticmethod
     def get_current_time(timezone):
         try:
-            response = requests.get(f"http://worldtimeapi.org/api/timezone/{timezone}")
+            response = requests.get(f"https://timeapi.io/api/Time/current/zone?timeZone={timezone}")
         except Exception as e:
             print(f"Exception while getting current time: {e}")
             return "N.A."
@@ -82,6 +82,6 @@ class InternetGetter:
         response_d = response.json()
         print(response_d)
         try:
-            return response_d["datetime"]
+            return response_d["dateTime"].rsplit('.', 1)[0]  # Delete the ns from the timestamp
         except KeyError:
             return "N.A."
